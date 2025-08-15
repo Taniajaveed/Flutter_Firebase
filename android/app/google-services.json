@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "705433208893",
+    "project_id": "shoeapp-60803",
+    "storage_bucket": "shoeapp-60803.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:705433208893:android:bee1eae39798cb02058254",
+        "android_client_info": {
+          "package_name": "com.example.flutter_structure_architecture"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBUzz6w4mq08mPaMOTEYxraGQdG0DQ_vOo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
