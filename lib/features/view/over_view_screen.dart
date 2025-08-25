@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_structure_architecture/features/view/add_to_cart_screen.dart';
+import 'package:flutter_structure_architecture/features/view/widgets/cart_card.dart';
 
 class OverViewScreen extends StatelessWidget {
   @override
@@ -10,7 +11,7 @@ class OverViewScreen extends StatelessWidget {
       appBar: AppBar(
         centerTitle: true,
         title: Text(
-          "My Cart",
+          "My Cart", //My Task
           style: TextStyle(
             fontSize: 40,
             fontWeight: FontWeight.w700,
@@ -19,8 +20,12 @@ class OverViewScreen extends StatelessWidget {
         actions: [
           IconButton(
             onPressed: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => AddToCartScreen()));
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => AddToCartScreen(),
+                ),
+              );
             },
             icon: Icon(
               Icons.add,
@@ -60,7 +65,7 @@ class OverViewScreen extends StatelessWidget {
                                 .update({
                                   'newfield' : 'hello ',
                                   'color' : 'fffffff',
-                                });
+                                },);
                           }
                         },
                         child: */
@@ -74,78 +79,13 @@ class OverViewScreen extends StatelessWidget {
                               date: snapshot.data!.docs[index]
                                   .data()['date']
                                   .toString(),
-                              color: Colors
-                                  .blueGrey //snapshot.data!.docs[index].data()['color'] ??
-                              //),
-                              );
+                              color: snapshot.data!.docs[index]
+                                      .data()['description'] ??
+                                  "" /*Colors.bluegrey*/);
                     },
                   ),
                 );
               },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class CartCard extends StatelessWidget {
-  final String title;
-  final String description;
-  final String date;
-  final Color color;
-
-  const CartCard({
-    super.key,
-    required this.title,
-    required this.description,
-    required this.date,
-    required this.color,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      color: color, // Background color of the card
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-      elevation: 4,
-      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Title and date in the same row
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Text(
-                  description,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: Colors.black54,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            // Description
-            Text(
-              date,
-              style: const TextStyle(
-                fontSize: 16,
-                color: Colors.black87,
-              ),
             ),
           ],
         ),

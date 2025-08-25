@@ -5,7 +5,9 @@ class HomeController {
   void goToShoeDetail(BuildContext context) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const ShoeApp()),
+      MaterialPageRoute(
+        builder: (context) => const ShoeApp(),
+      ),
     );
   }
 }

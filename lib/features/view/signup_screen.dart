@@ -1,40 +1,47 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_structure_architecture/features/view/over_view_screen.dart';
+import 'package:flutter_structure_architecture/features/view/home_screen.dart';
 import 'package:flutter_structure_architecture/features/view/widgets/login_box.dart';
 
-class UserLoginScreen extends StatefulWidget {
+class SignupScreen extends StatefulWidget {
   @override
-  State<UserLoginScreen> createState() => _UserLoginScreenState();
+  State<SignupScreen> createState() => _SignupScreenState();
 }
 
-class _UserLoginScreenState extends State<UserLoginScreen> {
+class _SignupScreenState extends State<SignupScreen> {
   final emailController = TextEditingController();
-  final PasswordController = TextEditingController();
-  final formKey = GlobalKey<
-      FormState>(); // it is a Form widget in flutter that groups and manage multiple input fields (TextFormFields).
+  final passwordController = TextEditingController();
+  final formKey = GlobalKey<FormState>();
   @override
   void dispose() {
     emailController.dispose();
-    PasswordController.dispose();
+    passwordController.dispose();
     super.dispose();
   }
 
-  Future<void> createUserwithEmailandPassword() async {
+  Future<void> createUserWithEmailandPassword() async {
     try {
       final UserCredential =
           await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: emailController.text.trim(),
-        password: PasswordController.text.trim(),
+        password: passwordController.text.trim(),
       );
-      print(UserCredential.user
-          ?.uid); //it will give particular user uid and only(.user) will give us all the details of user
+      if (User != null) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => MyHomePage(title: "mm"),
+          ),
+        );
+      }
+      print(UserCredential.user);
     } on FirebaseAuthException catch (e) {
       print(e.message);
     }
   }
 
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
@@ -43,7 +50,7 @@ class _UserLoginScreenState extends State<UserLoginScreen> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Text(
-            "Login",
+            "Sign Up",
             style: TextStyle(
               fontSize: 40.sp,
               fontWeight: FontWeight.w700,
@@ -62,7 +69,7 @@ class _UserLoginScreenState extends State<UserLoginScreen> {
           ),
           LoginBox(
             text: "   Password",
-            controller: PasswordController,
+            controller: passwordController,
           ),
           SizedBox(
             height: 300,
@@ -77,10 +84,10 @@ class _UserLoginScreenState extends State<UserLoginScreen> {
             ),
             child: IconButton(
               onPressed: () async {
-                await createUserwithEmailandPassword();
+                await createUserWithEmailandPassword();
               },
               icon: Text(
-                "Log In",
+                "Sign Up",
                 style: TextStyle(
                   fontSize: 18.sp.sp,
                   fontWeight: FontWeight.w700,
@@ -89,24 +96,14 @@ class _UserLoginScreenState extends State<UserLoginScreen> {
               ),
             ),
           ),
-          GestureDetector(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => OverViewScreen(),
-                ),
-              );
-            },
-            child: Text(
-              "Already have an account?? Signup",
-              style: TextStyle(
-                fontSize: 12.sp,
-                fontWeight: FontWeight.w700,
-                color: Color(0xff1F3643),
-              ),
-            ),
-          ),
+          // Text(
+          //   "Already have an account?? Signup",
+          //   style: TextStyle(
+          //     fontSize: 12.sp,
+          //     fontWeight: FontWeight.w700,
+          //     color: Color(0xff1F3643),
+          //   ),
+          // ),
         ],
       ),
     );

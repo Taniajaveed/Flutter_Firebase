@@ -1,7 +1,9 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_structure_architecture/features/view/home_screen.dart';
+import 'package:flutter_structure_architecture/features/view/signup_screen.dart';
 import 'package:flutter_structure_architecture/firebase_options.dart';
 
 void main() async {
@@ -18,11 +20,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ScreenUtilInit(
-        designSize: Size(430, 932),
-        minTextAdapt: true,
-        splitScreenMode: true,
-        builder: (context, child) {
-          return MaterialApp(
+      designSize: Size(430, 932),
+      minTextAdapt: true,
+      splitScreenMode: true,
+      builder: (context, child) {
+        return MaterialApp(
             debugShowCheckedModeBanner: false,
             title: 'Flutter Demo',
             theme: ThemeData(
@@ -30,8 +32,26 @@ class MyApp extends StatelessWidget {
               colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
               useMaterial3: true,
             ),
-            home: MyHomePage(title: 'Flutter Demo Home Page'),
-          );
-        });
+            home: StreamBuilder(
+              stream: FirebaseAuth.instance.authStateChanges(),
+              builder: (context, snapShot) {
+                if (snapShot.connectionState == ConnectionState.waiting) {
+                  return Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
+                if (snapShot.data != null) {
+                  return MyHomePage(title: "nnn");
+                }
+                return SignupScreen();
+              },
+            )
+            // FirebaseAuth.instance.currentUser != null
+            //     ? UserLoginScreen()
+            //     : SignupScreen(),
+            //MyHomePage(title: 'Flutter Demo Home Page'),
+            );
+      },
+    );
   }
 }

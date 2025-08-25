@@ -1,6 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_structure_architecture/features/controller/cart_controller.dart';
+import 'package:flutter_structure_architecture/features/model/cart_color_model.dart';
+import 'package:flutter_structure_architecture/features/model/cart_model.dart';
+import 'package:flutter_structure_architecture/screenutils.dart';
 import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
 
@@ -13,72 +17,36 @@ class AddToCartScreen extends StatefulWidget {
 
 class _AddToCartScreenState extends State<AddToCartScreen>
     with SingleTickerProviderStateMixin {
-  final titleController = TextEditingController();
-  final descriptionController = TextEditingController();
-  DateTime selectedDate = DateTime.now();
-  Color _selectedColor = Colors.blue;
+  final CartColorModel cartColors = CartColorModel();
+  final CartController controller = CartController();
 
   late TabController _tabController;
-  Color? selectedColor;
-  Color? selectedShade;
-
-  final List<Color> primaryColors = [
-    Colors.red,
-    Colors.pink,
-    Colors.purple,
-    Colors.indigo,
-    Colors.blue,
-    Colors.cyan,
-    Colors.green,
-    Colors.lightGreen,
-    Colors.lime,
-    Colors.yellow,
-    Colors.orange,
-    Colors.deepOrange,
-    Colors.brown,
-    Colors.blueGrey,
-    Colors.grey,
-  ];
-
-  final List<Color> shades = [
-    Colors.lightBlue.shade50,
-    Colors.lightBlue.shade100,
-    Colors.lightBlue.shade200,
-    Colors.lightBlue.shade300,
-    Colors.lightBlue.shade400,
-    Colors.lightBlue.shade500,
-    Colors.blue.shade600,
-    Colors.blue.shade700,
-  ];
 
   @override
-  void dispose() {
-    titleController.dispose();
-    descriptionController.dispose();
-    super.dispose();
-  }
-
   Future<void> AddCartToDb() async {
     try {
       final uuid = Uuid();
       final id = uuid.v4();
-      /*final data =*/ await FirebaseFirestore.instance
+
+      final cart = CartModel(
+        id: id,
+        title: controller.titleController.text.trim(),
+        description: controller.descriptionController.text.trim(),
+        creator: FirebaseAuth.instance.currentUser!.uid,
+        date: DateTime.now(),
+        postedAt: DateTime.now(),
+        color: rgbToHex(controller.selectedColor!),
+      );
+      await FirebaseFirestore.instance
           .collection("Cart")
           .doc(id)
-          .set({
-        "title": titleController.text.trim(),
-        "description": descriptionController.text.trim(),
-        "creator": FirebaseAuth.instance.currentUser!.uid,
-        "date": selectedDate,
-        "PostedAt": FieldValue.serverTimestamp(),
-        "color": rgbToHex(_selectedColor),
-      });
+          .set(cart.toMap());
 
       print(id); //print(data.id);
     } catch (e) {
       print(e);
     }
-  }
+  } //
 
   void initState() {
     super.initState();
@@ -119,21 +87,19 @@ class _AddToCartScreenState extends State<AddToCartScreen>
               );
               if (selDate != null) {
                 setState(() {
-                  selectedDate = selDate;
+                  controller.selectedDate = selDate;
                 });
               }
             },
             child: Padding(
               padding: const EdgeInsets.only(right: 8.0),
               child: Text(
-                DateFormat('MM-dd_y').format(selectedDate),
+                DateFormat('MM-dd_y').format(controller.selectedDate),
               ),
             ),
           ),
         ],
       ),
-
-      // backgroundColor: const Color(0xffFAF5FF),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
@@ -144,7 +110,7 @@ class _AddToCartScreenState extends State<AddToCartScreen>
 
               // Title field
               TextFormField(
-                controller: titleController,
+                controller: controller.titleController,
                 decoration: InputDecoration(
                   hintText: "Title",
                   border: OutlineInputBorder(
@@ -157,7 +123,7 @@ class _AddToCartScreenState extends State<AddToCartScreen>
               // Description field
               TextFormField(
                 maxLines: 3,
-                controller: descriptionController,
+                controller: controller.descriptionController,
                 decoration: InputDecoration(
                   hintText: "Description",
                   border: OutlineInputBorder(
@@ -199,14 +165,14 @@ class _AddToCartScreenState extends State<AddToCartScreen>
                 height: 110,
                 child: GridView.count(
                   crossAxisCount: 6,
-                  children: primaryColors
+                  children: cartColors.primaryColors
                       .map(
                         (color) => buildColorOption(
                           color,
-                          selectedColor == color,
+                          controller.selectedColor == color,
                           () {
                             setState(() {
-                              selectedColor = color;
+                              controller.selectedColor = color;
                             });
                           },
                         ),
@@ -224,14 +190,14 @@ class _AddToCartScreenState extends State<AddToCartScreen>
               SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: Row(
-                  children: shades
+                  children: cartColors.shades
                       .map(
                         (shade) => buildColorOption(
                           shade,
-                          selectedShade == shade,
+                          controller.selectedShade == shade,
                           () {
                             setState(() {
-                              selectedShade = shade;
+                              controller.selectedShade = shade;
                             });
                           },
                         ),
@@ -248,7 +214,7 @@ class _AddToCartScreenState extends State<AddToCartScreen>
                 height: 50,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.black,
+                    backgroundColor: Color(0xff298DC6),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
@@ -257,7 +223,7 @@ class _AddToCartScreenState extends State<AddToCartScreen>
                     await AddCartToDb();
                   },
                   child: const Text(
-                    "SUBMIT",
+                    "Add to Cart",
                     style: TextStyle(color: Colors.white, fontSize: 16),
                   ),
                 ),
@@ -270,6 +236,6 @@ class _AddToCartScreenState extends State<AddToCartScreen>
   }
 }
 
-String rgbToHex(Color color) {
-  return '${color.red.toRadixString(16).padLeft(2, '0')}${color.green.toRadixString(16).padLeft(2, '0')}${color.blue.toRadixString(16).padLeft(2, '0')}';
-}
+// String rgbToHex(Color color) {
+//   return '${color.red.toRadixString(16).padLeft(2, '0')}${color.green.toRadixString(16).padLeft(2, '0')}${color.blue.toRadixString(16).padLeft(2, '0')}';
+// }
